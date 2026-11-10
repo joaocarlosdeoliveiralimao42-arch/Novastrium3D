@@ -10,7 +10,7 @@ import { MARS_REGIONS, MARS_DATA } from "./marsData";
 import MarsImagery from "./MarsImagery";
 import MarswalkPlanner from "./MarswalkPlanner.jsx";
 import ScientificTargets from "./ScientificTargets.jsx";
-
+import AstroNexusAI from "./src/AstroNexusAI.jsx";
 function positionOnMars(latitude, longitude, radius = 2.02) {
   const lat = THREE.MathUtils.degToRad(latitude);
   const lon = THREE.MathUtils.degToRad(longitude);
@@ -1348,6 +1348,7 @@ export default function App() {
         <span>NOVASTRIUM · MARS EXPLORATION SYSTEM</span>
         <span>Projeto desenvolvido para NASA Space Apps Challenge 2026</span>
       </footer>
+      <AstroNexusAI />
     </main>
   );
 }
