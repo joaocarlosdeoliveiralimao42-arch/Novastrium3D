@@ -74,11 +74,11 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ reply });
 
-  } catch (error) {
+  }  } catch (error) {
+    console.error("Erro na AstroNexus AI:", error);
+
     return res.status(error.name === "AbortError" ? 504 : 500).json({
-      error: error.name === "AbortError"
-        ? "O Gemini demorou demais para responder. Tente novamente."
-        : "Erro interno ao consultar a inteligência artificial."
+      error: error.message || "Erro desconhecido ao consultar o Gemini."
     });
   }
 }
