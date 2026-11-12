@@ -6,11 +6,13 @@ import {
   Radio, Search, ShieldAlert, Telescope, Waves,
   ZoomIn, ZoomOut, Info, Satellite, Snowflake, Route, Target
 } from "lucide-react";
+
 import { MARS_REGIONS, MARS_DATA } from "./marsData";
 import MarsImagery from "./MarsImagery";
 import MarswalkPlanner from "./MarswalkPlanner.jsx";
 import ScientificTargets from "./ScientificTargets.jsx";
-import AstroNexusAI from "./src/AstroNexusAI.jsx";
+import AstroNexusAI from "./AstroNexusAI.jsx";
+
 function positionOnMars(latitude, longitude, radius = 2.02) {
   const lat = THREE.MathUtils.degToRad(latitude);
   const lon = THREE.MathUtils.degToRad(longitude);
@@ -26,6 +28,7 @@ function createNaturalMarsTexture() {
   const canvas = document.createElement("canvas");
   canvas.width = 2048;
   canvas.height = 1024;
+
   const ctx = canvas.getContext("2d");
   const image = ctx.createImageData(canvas.width, canvas.height);
 
@@ -55,14 +58,17 @@ function createNaturalMarsTexture() {
       const i = (y * canvas.width + x) * 4;
 
       image.data[i] = Math.max(45, Math.min(205, 157 + v - darkTerrain * 45));
+
       image.data[i + 1] = Math.max(
         24,
         Math.min(139, 76 + v * 0.58 - darkTerrain * 34 + latBand * 5)
       );
+
       image.data[i + 2] = Math.max(
         17,
         Math.min(105, 48 + v * 0.36 - darkTerrain * 24)
       );
+
       image.data[i + 3] = 255;
     }
   }
@@ -79,8 +85,10 @@ function createNaturalMarsTexture() {
 
   provinces.forEach(([x, y, rx, ry, color]) => {
     const g = ctx.createRadialGradient(x, y, 5, x, y, Math.max(rx, ry));
+
     g.addColorStop(0, color);
     g.addColorStop(1, "rgba(0,0,0,0)");
+
     ctx.fillStyle = g;
     ctx.save();
     ctx.translate(x, y);
@@ -119,6 +127,7 @@ function createNaturalMarsTexture() {
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
+
   return texture;
 }
 
@@ -131,13 +140,18 @@ function loadMolaTexture() {
     const base = MARS_DATA.baseLayer.url;
     const loader = new THREE.TextureLoader();
     const images = [];
+
     let completed = 0;
     let finished = false;
 
     const fallback = () => {
       if (finished) return;
+
       finished = true;
-      resolve({ texture: createFallbackTexture(), real: false });
+      resolve({
+        texture: createFallbackTexture(),
+        real: false
+      });
     };
 
     [0, 1].forEach((column) => {
@@ -151,10 +165,12 @@ function loadMolaTexture() {
 
           if (completed === 2) {
             const canvas = document.createElement("canvas");
+
             canvas.width = 512;
             canvas.height = 256;
 
             const ctx = canvas.getContext("2d");
+
             ctx.drawImage(images[0], 0, 0, 256, 256);
             ctx.drawImage(images[1], 256, 0, 256, 256);
 
@@ -162,7 +178,11 @@ function loadMolaTexture() {
             texture.colorSpace = THREE.SRGBColorSpace;
 
             finished = true;
-            resolve({ texture, real: true });
+
+            resolve({
+              texture,
+              real: true
+            });
           }
         },
         undefined,
@@ -173,7 +193,6 @@ function loadMolaTexture() {
     setTimeout(fallback, 15000);
   });
 }
-
 function MarsGlobe({
   selectedRegion,
   onSelectRegion,
@@ -282,6 +301,7 @@ function MarsGlobe({
     }
 
     const starGeometry = new THREE.BufferGeometry();
+
     starGeometry.setAttribute(
       "position",
       new THREE.Float32BufferAttribute(starPositions, 3)
@@ -629,6 +649,7 @@ function MarsGlobe({
       const centerLon = THREE.MathUtils.degToRad(longitude);
       const angularRadius = radiusKm / 3389.5;
       const center = positionOnMars(latitude, longitude, 2.018);
+
       const vertices = [center.x, center.y, center.z];
       const segments = 72;
       const boundary = [];
@@ -663,6 +684,7 @@ function MarsGlobe({
       }
 
       const geometry = new THREE.BufferGeometry();
+
       geometry.setAttribute(
         "position",
         new THREE.Float32BufferAttribute(vertices, 3)
@@ -815,8 +837,162 @@ function MarsGlobe({
 
   return <div className="globe-canvas" ref={mountRef} />;
 }
+const translations = {
+  pt: {
+    mission: "CONTROLE DA MISSÃO",
+    regions: "Regiões de Marte",
+    search: "Buscar região...",
+    exploration: "Exploração planetária",
+    references: "Dados e referências científicas",
+    planetaryDatabase: "BANCO DE DADOS PLANETÁRIO",
+    planetaryView: "VISUALIZAÇÃO PLANETÁRIA",
+    marsMap: "Mapa 3D de Marte",
+    interactiveGlobe: "GLOBO INTERATIVO",
+    planet: "PLANETA",
+    activeLayer: "CAMADA ATIVA",
+    mars: "MARTE",
+    iceIndicators: "INDICADORES DE GELO",
+    attentionFactors: "FATORES DE ATENÇÃO",
+    globalMola: "MOLA GLOBAL",
+    naturalView: "VISUALIZAÇÃO NATURAL",
+    molaRelief: "Relevo MOLA",
+    natural: "Natural",
+    ice: "Gelo",
+    attention: "Atenção",
+    selectedRegion: "REGIÃO SELECIONADA",
+    rotate: "Arraste para girar · Role para aproximar",
+    overview: "Visão geral",
+    science: "Ciência",
+    risks: "Riscos",
+    regionReport: "RELATÓRIO DA REGIÃO",
+    latitude: "LATITUDE",
+    longitude: "LONGITUDE",
+    terrain: "Características do terreno",
+    resources: "Recursos de interesse",
+    altitude: "Altitude e ambiente",
+    evaluation: "Avaliação preliminar",
+    priority: "Prioridade",
+    evidence: "Evidências",
+    uncertainty: "Incertezas",
+    scientificTarget: "Alvo científico selecionado",
+    objectives: "Objetivos científicos",
+    orbitalData: "Dados orbitais",
+    orbitalDescription: "As imagens orbitais podem ajudar a investigar a geologia e as características da superfície. A cobertura depende da região e do produto consultado.",
+    riskFactors: "Fatores que exigem atenção",
+    important: "Importante",
+    riskDisclaimer: "Esta lista é qualitativa. Não representa uma avaliação de risco calculada nem certifica segurança para uma missão tripulada.",
+    layerStatus: "STATUS DAS CAMADAS",
+    nasaLoaded: "Tile NASA carregado",
+    loadingNasa: "Carregando dados NASA...",
+    fallback: "Textura ilustrativa de reserva — serviço indisponível",
+    nasaLink: "Explorar NASA Mars Trek",
+    noResults: "Nenhuma região encontrada.",
+    dragZoom: "Aproximar",
+    zoomOut: "Afastar",
+    molaGlobal: "Relevo global MOLA",
+    nasaTileLoaded: "Tile NASA carregado",
+    sourceMola: "MOLA — relevo global",
+    activeGlobeLayer: "Camada visual ativa no globo",
+    hirise: "HiRISE — imagens orbitais",
+    hiriseDescription: "Consulta de imagens no catálogo NASA",
+    undergroundIce: "Gelo subterrâneo",
+    iceDescription: "Indicadores regionais qualitativos exibidos no globo",
+    hazards: "Perigos e obstáculos",
+    hazardsDescription: "Marcadores qualitativos; dados locais ainda necessários",
+    indicator: "INDICADOR",
+    catalog: "CATÁLOGO",
+    sourceDisclaimer: "Os indicadores de gelo e atenção são regionais e qualitativos. Não substituem produtos georreferenciados de alta resolução nem análise de missão.",
+    mapNote: "O mosaico MOLA é um relevo sombreado global. Não é um modelo de elevação local de alta resolução nem uma certificação de rota.",
+    iceNote: "Os círculos azuis indicam regiões de interesse relacionadas a possíveis depósitos de gelo. São marcadores regionais ilustrativos, não mostram limites, profundidade ou concentração do gelo.",
+    hazardsNote: "Os marcadores laranja/vermelhos destacam fatores qualitativos que exigem inspeção local. Não são um mapa de perigos medidos nem uma certificação de segurança.",
+    footer: "Projeto desenvolvido para NASA Space Apps Challenge 2026",
+    language: "Idioma"
+  },
+
+  en: {
+    mission: "MISSION CONTROL",
+    regions: "Mars Regions",
+    search: "Search region...",
+    exploration: "Planetary exploration",
+    references: "Scientific data and references",
+    planetaryDatabase: "PLANETARY DATABASE",
+    planetaryView: "PLANETARY VISUALIZATION",
+    marsMap: "Mars 3D Map",
+    interactiveGlobe: "INTERACTIVE GLOBE",
+    planet: "PLANET",
+    activeLayer: "ACTIVE LAYER",
+    mars: "MARS",
+    iceIndicators: "ICE INDICATORS",
+    attentionFactors: "ATTENTION FACTORS",
+    globalMola: "GLOBAL MOLA",
+    naturalView: "NATURAL VIEW",
+    molaRelief: "MOLA Relief",
+    natural: "Natural",
+    ice: "Ice",
+    attention: "Attention",
+    selectedRegion: "SELECTED REGION",
+    rotate: "Drag to rotate · Scroll to zoom",
+    overview: "Overview",
+    science: "Science",
+    risks: "Risks",
+    regionReport: "REGION REPORT",
+    latitude: "LATITUDE",
+    longitude: "LONGITUDE",
+    terrain: "Terrain characteristics",
+    resources: "Resources of interest",
+    altitude: "Altitude and environment",
+    evaluation: "Preliminary assessment",
+    priority: "Priority",
+    evidence: "Evidence",
+    uncertainty: "Uncertainties",
+    scientificTarget: "Selected scientific target",
+    objectives: "Scientific objectives",
+    orbitalData: "Orbital data",
+    orbitalDescription: "Orbital images can help investigate geology and surface features. Coverage depends on the region and the product being consulted.",
+    riskFactors: "Factors requiring attention",
+    important: "Important",
+    riskDisclaimer: "This list is qualitative. It is not a calculated risk assessment and does not certify safety for a crewed mission.",
+    layerStatus: "LAYER STATUS",
+    nasaLoaded: "NASA tile loaded",
+    loadingNasa: "Loading NASA data...",
+    fallback: "Fallback illustrative texture — service unavailable",
+    nasaLink: "Explore NASA Mars Trek",
+    noResults: "No regions found.",
+    dragZoom: "Zoom in",
+    zoomOut: "Zoom out",
+    molaGlobal: "Global MOLA relief",
+    nasaTileLoaded: "NASA tile loaded",
+    sourceMola: "MOLA — global relief",
+    activeGlobeLayer: "Visual layer active on the globe",
+    hirise: "HiRISE — orbital images",
+    hiriseDescription: "Search images in the NASA catalog",
+    undergroundIce: "Underground ice",
+    iceDescription: "Qualitative regional indicators displayed on the globe",
+    hazards: "Hazards and obstacles",
+    hazardsDescription: "Qualitative markers; local data is still required",
+    indicator: "INDICATOR",
+    catalog: "CATALOG",
+    sourceDisclaimer: "Ice and attention indicators are regional and qualitative. They do not replace high-resolution georeferenced products or mission analysis.",
+    mapNote: "The MOLA mosaic is a global shaded-relief map. It is not a high-resolution local elevation model or route certification.",
+    iceNote: "Blue circles indicate areas of interest related to possible ice deposits. They are illustrative regional markers and do not show ice boundaries, depth, or concentration.",
+    hazardsNote: "Orange/red markers highlight qualitative factors requiring local inspection. They are not a measured hazard map or a safety certification.",
+    footer: "Project developed for NASA Space Apps Challenge 2026",
+    language: "Language"
+  }
+};
 
 export default function App() {
+  const [language, setLanguage] = useState(() => {
+    const savedLanguage = window.localStorage.getItem("astronexus-language");
+    return savedLanguage === "en" ? "en" : "pt";
+  });
+
+  const t = translations[language];
+
+  useEffect(() => {
+    window.localStorage.setItem("astronexus-language", language);
+  }, [language]);
+
   const [selectedRegion, setSelectedRegion] = useState("arcadia");
   const [textureLoaded, setTextureLoaded] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
@@ -859,7 +1035,7 @@ export default function App() {
   );
 
   return (
-    <main className="app-shell">
+        <main className="app-shell">
       <header className="topbar">
         <div className="brand">
           <div className="brand-symbol">
@@ -867,16 +1043,30 @@ export default function App() {
           </div>
 
           <div>
-            <h1>NOVASTRIUM</h1>
+            <h1>AstroNexus</h1>
             <span>MARS EXPLORATION SYSTEM</span>
           </div>
         </div>
 
         <div className="top-status">
           <span className="status-dot" />
-          <span>MISSION CONTROL</span>
+          <span>{t.mission}</span>
           <span className="top-divider" />
           <span>NASA SPACE APPS 2026</span>
+          <span className="top-divider" />
+
+          <label className="language-selector">
+            <span>{t.language}:</span>
+
+            <select
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              aria-label={t.language}
+            >
+              <option value="pt">🇧🇷 Português</option>
+              <option value="en">🇺🇸 English</option>
+            </select>
+          </label>
         </div>
       </header>
 
@@ -884,18 +1074,19 @@ export default function App() {
         <aside className="left-panel">
           <div className="panel-heading">
             <div>
-              <span className="eyebrow">PLANETARY DATABASE</span>
-              <h2>Regiões de Marte</h2>
+              <span className="eyebrow">{t.planetaryDatabase}</span>
+              <h2>{t.regions}</h2>
             </div>
             <Compass size={20} />
           </div>
 
           <div className="search-box">
             <Search size={17} />
+
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar região..."
+              placeholder={t.search}
             />
           </div>
 
@@ -915,6 +1106,7 @@ export default function App() {
                 <div className="region-card-text">
                   <strong>{item.name}</strong>
                   <span>{item.subtitle}</span>
+
                   <small>
                     {item.latitude.toFixed(1)}° · {item.longitude.toFixed(1)}°
                   </small>
@@ -925,7 +1117,7 @@ export default function App() {
             ))}
 
             {filteredRegions.length === 0 && (
-              <p className="empty-search">Nenhuma região encontrada.</p>
+              <p className="empty-search">{t.noResults}</p>
             )}
           </div>
 
@@ -935,8 +1127,8 @@ export default function App() {
             </div>
 
             <div>
-              <strong>Exploração planetária</strong>
-              <span>Dados e referências científicas</span>
+              <strong>{t.exploration}</strong>
+              <span>{t.references}</span>
             </div>
           </div>
         </aside>
@@ -944,13 +1136,13 @@ export default function App() {
         <section className="center-panel">
           <div className="map-header">
             <div>
-              <span className="eyebrow">VISUALIZAÇÃO PLANETÁRIA</span>
-              <h2>Mapa 3D de Marte</h2>
+              <span className="eyebrow">{t.planetaryView}</span>
+              <h2>{t.marsMap}</h2>
             </div>
 
             <div className="map-controls-label">
               <span className="live-dot" />
-              GLOBO INTERATIVO
+              {t.interactiveGlobe}
             </div>
           </div>
 
@@ -967,20 +1159,21 @@ export default function App() {
             />
 
             <div className="globe-label top-left">
-              <span>PLANETA</span>
-              <strong>MARTE</strong>
+              <span>{t.planet}</span>
+              <strong>{t.mars}</strong>
             </div>
 
             <div className="globe-label top-right">
-              <span>CAMADA ATIVA</span>
+              <span>{t.activeLayer}</span>
+
               <strong>
                 {activeOverlay === "ice"
-                  ? "INDICADORES DE GELO"
+                  ? t.iceIndicators
                   : activeOverlay === "hazards"
-                    ? "FATORES DE ATENÇÃO"
+                    ? t.attentionFactors
                     : activeLayer === "mola"
-                      ? "MOLA GLOBAL"
-                      : "VISUALIZAÇÃO NATURAL"}
+                      ? t.globalMola
+                      : t.naturalView}
               </strong>
             </div>
 
@@ -990,7 +1183,7 @@ export default function App() {
                 onClick={() => setActiveLayer("mola")}
               >
                 <Mountain size={15} />
-                Relevo MOLA
+                {t.molaRelief}
               </button>
 
               <button
@@ -998,18 +1191,20 @@ export default function App() {
                 onClick={() => setActiveLayer("natural")}
               >
                 <Globe2 size={15} />
-                Natural
+                {t.natural}
               </button>
 
               <button
                 className={activeOverlay === "ice" ? "active" : ""}
                 onClick={() =>
-                  setActiveOverlay(activeOverlay === "ice" ? "none" : "ice")
+                  setActiveOverlay(
+                    activeOverlay === "ice" ? "none" : "ice"
+                  )
                 }
                 aria-pressed={activeOverlay === "ice"}
               >
                 <Snowflake size={15} />
-                Gelo
+                {t.ice}
               </button>
 
               <button
@@ -1022,46 +1217,62 @@ export default function App() {
                 aria-pressed={activeOverlay === "hazards"}
               >
                 <ShieldAlert size={15} />
-                Atenção
+                {t.attention}
               </button>
             </div>
 
             <div className="zoom-controls">
-              <button onClick={() => zoomActions?.in()} aria-label="Aproximar">
+              <button
+                onClick={() => zoomActions?.in()}
+                aria-label={t.dragZoom}
+              >
                 <ZoomIn size={21} />
               </button>
 
-              <button onClick={() => zoomActions?.out()} aria-label="Afastar">
+              <button
+                onClick={() => zoomActions?.out()}
+                aria-label={t.zoomOut}
+              >
                 <ZoomOut size={21} />
               </button>
             </div>
 
             <div className="globe-instructions">
               <Compass size={14} />
-              Arraste para girar · Role para aproximar
+              {t.rotate}
             </div>
 
             <div className="globe-coordinate">
-              <span>REGIÃO SELECIONADA</span>
+              <span>{t.selectedRegion}</span>
               <strong>{region.name}</strong>
             </div>
           </div>
 
           <div className="layer-status">
             <div>
-              <span className={`layer-status-dot ${textureLoaded === true ? "available" : ""}`} />
-              <strong>Relevo global MOLA</strong>
+              <span
+                className={`layer-status-dot ${
+                  textureLoaded === true ? "available" : ""
+                }`}
+              />
+
+              <strong>{t.molaGlobal}</strong>
+
               <small>
                 {textureLoaded === true
-                  ? "Tile NASA carregado"
+                  ? t.nasaTileLoaded
                   : textureLoaded === false
-                    ? "Textura ilustrativa de reserva — serviço indisponível"
-                    : "Carregando dados NASA..."}
+                    ? t.fallback
+                    : t.loadingNasa}
               </small>
             </div>
 
-            <a href="https://trek.nasa.gov/" target="_blank" rel="noreferrer">
-              NASA Mars Trek ↗
+            <a
+              href="https://trek.nasa.gov/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t.nasaLink} ↗
             </a>
           </div>
 
@@ -1078,38 +1289,42 @@ export default function App() {
 
             <div className="map-bottom-item">
               <span className="legend-dot jezero-dot" />
-              Cratera Jezero
+              {language === "pt" ? "Cratera Jezero" : "Jezero Crater"}
             </div>
           </div>
 
           <div className="map-note">
             <Activity size={15} />
-            <span>
-              O mosaico MOLA é um relevo sombreado global. Não é um modelo
-              de elevação local de alta resolução nem uma certificação de rota.
-            </span>
+            <span>{t.mapNote}</span>
           </div>
 
           {activeOverlay !== "none" && (
             <div className="map-note">
               <Info size={15} />
+
               <span>
                 {activeOverlay === "ice"
-                  ? "Os círculos azuis indicam regiões de interesse relacionadas a possíveis depósitos de gelo. São marcadores regionais ilustrativos, não mostram limites, profundidade ou concentração do gelo."
-                  : "Os marcadores laranja/vermelhos destacam fatores qualitativos que exigem inspeção local. Não são um mapa de perigos medidos nem uma certificação de segurança."}
+                  ? t.iceNote
+                  : t.hazardsNote}
               </span>
             </div>
           )}
 
-          <MarswalkPlanner onRouteChange={handleRouteChange} />
+          <MarswalkPlanner
+            onRouteChange={handleRouteChange}
+            language={language}
+          />
 
-          <ScientificTargets onSelectTarget={handleTargetSelect} />
+          <ScientificTargets
+            onSelectTarget={handleTargetSelect}
+            language={language}
+          />
         </section>
 
         <aside className="right-panel">
           <div className="details-header">
             <div>
-              <span className="eyebrow">RELATÓRIO DA REGIÃO</span>
+              <span className="eyebrow">{t.regionReport}</span>
               <h2>{region.name}</h2>
             </div>
 
@@ -1118,16 +1333,18 @@ export default function App() {
             </div>
           </div>
 
-          <p className="region-description">{region.description}</p>
+          <p className="region-description">
+            {region.description}
+          </p>
 
           <div className="coordinate-box">
             <div>
-              <span>LATITUDE</span>
+              <span>{t.latitude}</span>
               <strong>{region.latitude.toFixed(2)}°</strong>
             </div>
 
             <div>
-              <span>LONGITUDE</span>
+              <span>{t.longitude}</span>
               <strong>{region.longitude.toFixed(2)}°</strong>
             </div>
           </div>
@@ -1137,21 +1354,21 @@ export default function App() {
               className={activeTab === "overview" ? "active" : ""}
               onClick={() => setActiveTab("overview")}
             >
-              Visão geral
+              {t.overview}
             </button>
 
             <button
               className={activeTab === "science" ? "active" : ""}
               onClick={() => setActiveTab("science")}
             >
-              Ciência
+              {t.science}
             </button>
 
             <button
               className={activeTab === "risks" ? "active" : ""}
               onClick={() => setActiveTab("risks")}
             >
-              Riscos
+              {t.risks}
             </button>
           </div>
 
@@ -1160,16 +1377,18 @@ export default function App() {
               <div className="detail-block">
                 <div className="detail-title">
                   <Mountain size={17} />
-                  <strong>Características do terreno</strong>
+                  <strong>{t.terrain}</strong>
                 </div>
+
                 <p>{region.terrain}</p>
               </div>
 
               <div className="detail-block">
                 <div className="detail-title">
                   <Waves size={17} />
-                  <strong>Recursos de interesse</strong>
+                  <strong>{t.resources}</strong>
                 </div>
+
                 <ul>
                   {region.resources.map((item) => (
                     <li key={item}>{item}</li>
@@ -1180,8 +1399,9 @@ export default function App() {
               <div className="detail-block">
                 <div className="detail-title">
                   <Activity size={17} />
-                  <strong>Altitude e ambiente</strong>
+                  <strong>{t.altitude}</strong>
                 </div>
+
                 <p>{region.elevation}</p>
                 <p>{region.temperature}</p>
               </div>
@@ -1190,19 +1410,22 @@ export default function App() {
                 <div className="investigation-card">
                   <div className="detail-title">
                     <Info size={17} />
-                    <strong>Avaliação preliminar</strong>
+                    <strong>{t.evaluation}</strong>
                   </div>
 
                   <p>
-                    <strong>Prioridade:</strong> {region.investigation.priority}
+                    <strong>{t.priority}:</strong>{" "}
+                    {region.investigation.priority}
                   </p>
 
                   <p>
-                    <strong>Evidências:</strong> {region.investigation.evidence}
+                    <strong>{t.evidence}:</strong>{" "}
+                    {region.investigation.evidence}
                   </p>
 
                   <div className="uncertainty-card">
-                    <strong>Incertezas:</strong> {region.investigation.uncertainty}
+                    <strong>{t.uncertainty}:</strong>{" "}
+                    {region.investigation.uncertainty}
                   </div>
                 </div>
               )}
@@ -1215,15 +1438,35 @@ export default function App() {
                 <div className="investigation-card">
                   <div className="detail-title">
                     <Target size={17} />
-                    <strong>Alvo científico selecionado</strong>
+                    <strong>{t.scientificTarget}</strong>
                   </div>
 
-                  <p><strong>{selectedTarget.name}</strong></p>
-                  <p>{selectedTarget.focus}</p>
-                  <p><strong>Questão:</strong> {selectedTarget.question}</p>
-                  <p><strong>Justificativa:</strong> {selectedTarget.rationale}</p>
                   <p>
-                    <strong>Referência:</strong> {selectedTarget.latitude}°, {selectedTarget.longitude}°
+                    <strong>{selectedTarget.name}</strong>
+                  </p>
+
+                  <p>{selectedTarget.focus}</p>
+
+                  <p>
+                    <strong>
+                      {language === "pt" ? "Questão:" : "Question:"}
+                    </strong>{" "}
+                    {selectedTarget.question}
+                  </p>
+
+                  <p>
+                    <strong>
+                      {language === "pt" ? "Justificativa:" : "Rationale:"}
+                    </strong>{" "}
+                    {selectedTarget.rationale}
+                  </p>
+
+                  <p>
+                    <strong>
+                      {language === "pt" ? "Referência:" : "Reference:"}
+                    </strong>{" "}
+                    {selectedTarget.latitude}°,{" "}
+                    {selectedTarget.longitude}°
                   </p>
                 </div>
               )}
@@ -1231,7 +1474,7 @@ export default function App() {
               <div className="detail-block">
                 <div className="detail-title">
                   <Telescope size={17} />
-                  <strong>Objetivos científicos</strong>
+                  <strong>{t.objectives}</strong>
                 </div>
 
                 <ul>
@@ -1244,14 +1487,10 @@ export default function App() {
               <div className="detail-block">
                 <div className="detail-title">
                   <Satellite size={17} />
-                  <strong>Dados orbitais</strong>
+                  <strong>{t.orbitalData}</strong>
                 </div>
 
-                <p>
-                  As imagens orbitais podem ajudar a investigar a geologia
-                  e as características da superfície. A cobertura depende
-                  da região e do produto consultado.
-                </p>
+                <p>{t.orbitalDescription}</p>
               </div>
             </div>
           )}
@@ -1261,7 +1500,7 @@ export default function App() {
               <div className="detail-block">
                 <div className="detail-title warning-title">
                   <ShieldAlert size={17} />
-                  <strong>Fatores que exigem atenção</strong>
+                  <strong>{t.riskFactors}</strong>
                 </div>
 
                 <ul>
@@ -1272,59 +1511,62 @@ export default function App() {
               </div>
 
               <div className="risk-warning">
-                <strong>Importante</strong>
-                <p>
-                  Esta lista é qualitativa. Não representa uma avaliação
-                  de risco calculada nem certifica segurança para uma
-                  missão tripulada.
-                </p>
+                <strong>{t.important}</strong>
+
+                <p>{t.riskDisclaimer}</p>
               </div>
             </div>
           )}
 
           <div className="sources-area">
-            <span className="eyebrow">STATUS DAS CAMADAS</span>
+            <span className="eyebrow">{t.layerStatus}</span>
 
             <div className="source-row">
               <Mountain size={15} />
+
               <div>
-                <strong>MOLA — relevo global</strong>
-                <span>Camada visual ativa no globo</span>
+                <strong>{t.sourceMola}</strong>
+                <span>{t.activeGlobeLayer}</span>
               </div>
+
               <span className="source-tag">WMTS</span>
             </div>
 
             <div className="source-row">
               <Satellite size={15} />
+
               <div>
-                <strong>HiRISE — imagens orbitais</strong>
-                <span>Consulta de imagens no catálogo NASA</span>
+                <strong>{t.hirise}</strong>
+                <span>{t.hiriseDescription}</span>
               </div>
-              <span className="source-tag">CATÁLOGO</span>
+
+              <span className="source-tag">{t.catalog}</span>
             </div>
 
             <div className="source-row">
               <Snowflake size={15} />
+
               <div>
-                <strong>Gelo subterrâneo</strong>
-                <span>Indicadores regionais qualitativos exibidos no globo</span>
+                <strong>{t.undergroundIce}</strong>
+                <span>{t.iceDescription}</span>
               </div>
-              <span className="source-tag">INDICADOR</span>
+
+              <span className="source-tag">{t.indicator}</span>
             </div>
 
             <div className="source-row">
               <Route size={15} />
+
               <div>
-                <strong>Perigos e obstáculos</strong>
-                <span>Marcadores qualitativos; dados locais ainda necessários</span>
+                <strong>{t.hazards}</strong>
+                <span>{t.hazardsDescription}</span>
               </div>
-              <span className="source-tag">INDICADOR</span>
+
+              <span className="source-tag">{t.indicator}</span>
             </div>
 
             <p className="source-disclaimer">
-              Os indicadores de gelo e atenção são regionais e qualitativos.
-              Não substituem produtos georreferenciados de alta resolução
-              nem análise de missão.
+              {t.sourceDisclaimer}
             </p>
 
             <a
@@ -1333,22 +1575,25 @@ export default function App() {
               target="_blank"
               rel="noreferrer"
             >
-              Explorar NASA Mars Trek ↗
+              {t.nasaLink} ↗
             </a>
           </div>
         </aside>
       </section>
 
-      {/* GALERIA DE IMAGENS NO FINAL DA PÁGINA */}
       <section className="imagery-wide">
-        <MarsImagery region={region} />
+        <MarsImagery
+          region={region}
+          language={language}
+        />
       </section>
 
       <footer className="app-footer">
-        <span>NOVASTRIUM · MARS EXPLORATION SYSTEM</span>
-        <span>Projeto desenvolvido para NASA Space Apps Challenge 2026</span>
+        <span>AstroNexus · MARS EXPLORATION SYSTEM</span>
+        <span>{t.footer}</span>
       </footer>
-      <AstroNexusAI />
+
+      <AstroNexusAI language={language} />
     </main>
   );
 }
